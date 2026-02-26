@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo y Gestión</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    
+    <style>
+        /* --- PALETA DE COLORES (Dorado y Cremita) --- */
+        :root {
+            --bg-dark: #2a2416;
+            --card-dark: #f5e6d3;
+            --accent-gold: #d4af37;
+            --text-white: #2a2416;
+            --text-muted: #8b7355;
+            --border-color: #d4af37;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5e6d3 0%, #faf0e6 100%);
+            color: var(--text-white);
+            margin: 0; padding: 0;
+            padding-bottom: 50px;
+        }
+
+        /* --- ENCABEZADO --- */
+        header {
+            background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid #b8941e;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2a2416;
+            margin: 0 0 15px 0;
+        }
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        nav a, nav button {
+            color: #2a2416;
+            text-decoration: none;
+            font-size: 1rem;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            background: rgba(255, 255, 255, 0.3);
+            border: 2px solid transparent;
+            cursor: pointer;
+            font-family: 'Poppins';
+            font-weight: 600;
+        }
+        nav a:hover, nav button:hover {
+            background: rgba(255, 255, 255, 0.6);
+            border-color: #2a2416;
+            transform: translateY(-2px);
+        }
+        .logo { font-size: 1.5rem; font-weight: 900; color: var(--accent-gold); text-transform: uppercase;}
+        .cart-icon { position: fixed; top: 20px; right: 20px; z-index: 500; cursor: pointer; font-size: 1.8rem; color: var(--accent-gold); }
+        .cart-badge {
+            position: absolute; top: -5px; right: -10px; background: #2a2416; color: #d4af37;
+            font-size: 0.7rem; font-weight: bold; padding: 2px 6px; border-radius: 50%;
+        }
+
+        /* --- PANELES DE ACCIÓN Y NAVEGACIÓN --- */
+        .top-controls {
+            padding: 20px; display: flex; flex-direction: column; gap: 15px;
+        }
+        
+        /* Botones de acción principales (Crear y Tasa) */
+        .action-buttons {
+            display: flex; gap: 10px;
+        }
+        .btn-action {
+            flex: 1; padding: 12px; border-radius: 8px; font-weight: bold; font-family: 'Poppins'; cursor: pointer;
+            display: flex; justify-content: center; align-items: center; gap: 8px; font-size: 0.95rem; border: none;
+        }
+        .btn-tasa { background-color: transparent; border: 1px solid var(--accent-gold); color: var(--accent-gold); }
+        .btn-crear { background-color: var(--accent-gold); color: var(--bg-dark); }
+
+        /* Pestañas de Navegación (Catálogo / Ventas) */
+        .nav-tabs {
+            display: flex; border-bottom: 1px solid var(--border-color);
+        }
+        .tab-btn {
+            flex: 1; padding: 10px; background: transparent; color: var(--text-muted); border: none; font-weight: 600; cursor: pointer; font-size: 1rem; border-bottom: 3px solid transparent; transition: 0.3s;
+        }
+        .tab-btn.active { color: var(--accent-gold); border-bottom-color: var(--accent-gold); }
+
+        /* --- SECCIÓN DE BIENVENIDA --- */
+        .welcome-section {
+            padding: 60px 20px;
+            text-align: center;
+            background: linear-gradient(to bottom, #faf0e6, #f5e6d3);
+        }
+        .welcome-section h2 {
+            font-size: 2.5rem;
+            color: #2a2416;
+            margin-bottom: 15px;
+        }
+        .welcome-section p {
+            font-size: 1.1rem;
+            color: #8b7355;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* --- SECCIONES --- */
+        .content-section { display: none; padding: 20px; }
+        .content-section.active { display: block; }
+        .content-section h2 {
+            font-size: 2rem;
+            color: #2a2416;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .tasa-actual-info { font-size: 0.85rem; color: #8b7355; margin-bottom: 15px; text-align: center; }
+        .tasa-actual-info span { color: var(--accent-gold); font-weight: bold; }
+        
+        .sales-summary {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px solid var(--accent-gold);
+            text-align: center;
+        }
+        .sales-summary h3 {
+            color: #2a2416;
+            margin-bottom: 15px;
+        }
+        .sales-summary .total-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #f5e6d3;
+        }
+        .sales-summary .total-item:last-child {
+            border-bottom: none;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--accent-gold);
+        }
+
+        /* --- CATÁLOGO --- */
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
+        .product-card {
+            background: white; border: 2px solid var(--border-color); border-radius: 10px; overflow: hidden; position: relative;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+        .product-img { width: 100%; height: 140px; object-fit: cover; background: #f5e6d3; }
+        .btn-delete {
+            position: absolute; top: 5px; right: 5px; background: rgba(212, 175, 55, 0.9); color: white; border: none; border-radius: 5px; cursor: pointer; padding: 5px 8px;
+        }
+        .product-info { padding: 12px; text-align: center; }
+        .product-name { font-weight: 700; font-size: 0.95rem; margin-bottom: 5px; color: #2a2416;}
+        .product-price-usd { font-size: 1.2rem; font-weight: 900; color: var(--accent-gold); }
+        .product-price-bs { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 10px; }
+        .btn-add-cart { width: 100%; padding: 8px; background: var(--accent-gold); color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s;}
+        .btn-add-cart:hover { background: #b8941e; }
+
+        /* --- VENTAS --- */
+        .sales-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; background: white; border-radius: 10px; overflow: hidden; }
+        .sales-table th, .sales-table td { padding: 10px; text-align: left; border-bottom: 1px solid #f5e6d3; vertical-align: middle; }
+        .sales-table th { color: white; background: var(--accent-gold); font-weight: 700; }
+        .sales-table tr:hover { background: #faf0e6; }
+        .product-collage { display: flex; gap: 8px; flex-wrap: wrap; max-width: 200px; align-items: center; }
+        .product-collage-item { position: relative; display: inline-block; }
+        .product-collage img { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; border: 2px solid var(--border-color); }
+        .product-count-badge { 
+            position: absolute; 
+            top: -5px; 
+            right: -5px; 
+            background: var(--accent-gold); 
+            color: white; 
+            font-size: 0.7rem; 
+            font-weight: bold; 
+            padding: 2px 6px; 
+            border-radius: 50%; 
+            border: 2px solid white;
+            min-width: 20px;
+            text-align: center;
+        }
+        .product-names { font-size: 0.75rem; color: #8b7355; margin-top: 5px; line-height: 1.3; }
+        .btn-delete-sale {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        .btn-delete-sale:hover {
+            background: #c82333;
+        }
+
+        /* --- MODALES (Ventanas emergentes) --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(42, 36, 22, 0.9); z-index: 2000; display: none; justify-content: center; align-items: center;
+        }
+        .modal-box { background: white; padding: 25px; border-radius: 10px; width: 90%; max-width: 350px; border: 3px solid var(--accent-gold); }
+        .modal-box h3 { color: var(--accent-gold); margin-top: 0; text-align: center; }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.9rem; color: #2a2416; }
+        .input-field {
+            width: 100%; box-sizing: border-box; padding: 10px; background: #faf0e6; border: 2px solid var(--border-color); color: #2a2416; border-radius: 5px; font-family: 'Poppins'; outline: none;
+        }
+        .input-field:focus { border-color: #b8941e; background: white; }
+        
+        /* Controles de Foto */
+        .photo-options { display: flex; gap: 10px; margin-bottom: 10px; }
+        .btn-photo-opt { flex: 1; padding: 8px; background: #faf0e6; color: #8b7355; border: 2px solid var(--border-color); border-radius: 5px; cursor: pointer; font-weight: 600; }
+        .btn-photo-opt.active { background: var(--accent-gold); color: white; border-color: #b8941e; }
+        .photo-input-zone { display: none; }
+        .photo-input-zone.active { display: block; }
+        #preview-img { width: 100%; height: 120px; object-fit: cover; border-radius: 5px; margin-top: 10px; display: none; border: 2px solid var(--accent-gold); }
+
+        .calc-preview { background: #faf0e6; padding: 10px; border-radius: 5px; text-align: center; margin-bottom: 15px; color: #8b7355; border: 2px solid var(--accent-gold); }
+        .calc-preview span { color: var(--accent-gold); font-weight: bold; font-size: 1.2rem; display: block; }
+
+        .modal-btns { display: flex; gap: 10px; }
+        .btn-cancel { flex: 1; padding: 10px; background: transparent; border: 2px solid var(--border-color); color: #2a2416; border-radius: 5px; cursor: pointer; font-weight: 600; }
+        .btn-cancel:hover { background: #faf0e6; }
+        .btn-save { flex: 1; padding: 10px; background: var(--accent-gold); border: none; color: white; font-weight: bold; border-radius: 5px; cursor: pointer; }
+        .btn-save:hover { background: #b8941e; }
+
+        /* --- CARRITO SIDEBAR --- */
+        .cart-sidebar {
+            position: fixed; top: 0; right: -100%; width: 100%; max-width: 350px; height: 100vh; background: white; z-index: 1000; padding: 20px; display: flex; flex-direction: column; box-sizing: border-box; transition: right 0.3s; border-left: 3px solid var(--accent-gold);
+            box-shadow: -4px 0 10px rgba(0,0,0,0.2);
+        }
+        .cart-sidebar.open { right: 0; }
+        .cart-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--accent-gold); padding-bottom: 15px; margin-bottom: 15px; }
+        .cart-header h2 { margin: 0; color: var(--accent-gold); }
+        .cart-header button { color: #2a2416; }
+        .cart-items { flex-grow: 1; overflow-y: auto; }
+        .cart-item { display: flex; justify-content: space-between; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #f5e6d3; color: #2a2416; }
+        .cart-footer { padding-top: 15px; border-top: 2px solid var(--accent-gold); color: #2a2416; }
+        .btn-pay { width: 100%; padding: 15px; background: var(--accent-gold); color: white; border: none; font-weight: 900; font-size: 1.1rem; border-radius: 5px; cursor: pointer; margin-top: 10px;}
+        .btn-pay:hover { background: #b8941e; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Catálogo de Productos</h1>
+        <nav>
+            <a href="#inicio" onclick="document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));">Inicio</a>
+            <button onclick="cambiarPestana('catalogo'); setTimeout(() => document.getElementById('productos').scrollIntoView({behavior: 'smooth'}), 100);">Catálogo</button>
+            <button onclick="cambiarPestana('ventas'); setTimeout(() => document.getElementById('productos').scrollIntoView({behavior: 'smooth'}), 100);">Gestión de Compras</button>
+            <button onclick="abrirModalTasa()"><i class="ri-exchange-dollar-line"></i> Fijar Tasa</button>
+            <button onclick="abrirModalCrear()"><i class="ri-add-box-line"></i> Agregar Producto</button>
+        </nav>
+    </header>
+
+    <div class="cart-icon" onclick="toggleCarrito()">
+        <i class="ri-shopping-cart-fill"></i>
+        <span class="cart-badge" id="cart-count">0</span>
+    </div>
+
+    <section class="welcome-section" id="inicio">
+        <h2>Bienvenido al Catálogo</h2>
+        <p>Gestiona tus productos y ventas de manera fácil y rápida</p>
+        <div style="margin-top: 30px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+            <button onclick="cambiarPestana('catalogo'); setTimeout(() => document.getElementById('productos').scrollIntoView({behavior: 'smooth'}), 100);" style="padding: 15px 30px; background: var(--accent-gold); color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: 700; cursor: pointer; font-family: 'Poppins'; transition: 0.3s;">
+                <i class="ri-store-3-line"></i> Ver Catálogo
+            </button>
+            <button onclick="cambiarPestana('ventas'); setTimeout(() => document.getElementById('productos').scrollIntoView({behavior: 'smooth'}), 100);" style="padding: 15px 30px; background: white; color: var(--accent-gold); border: 2px solid var(--accent-gold); border-radius: 8px; font-size: 1.1rem; font-weight: 700; cursor: pointer; font-family: 'Poppins'; transition: 0.3s;">
+                <i class="ri-shopping-bag-line"></i> Ver Compras
+            </button>
+        </div>
+    </section>
+
+    <div style="padding: 20px 0;"></div>
+
+    <section id="sec-catalogo" class="content-section">
+        <h2 id="productos">Nuestros Productos</h2>
+        <div class="tasa-actual-info">Tasa de cálculo actual: <span id="info-tasa-catalogo">No fijada</span></div>
+        <div class="products-grid" id="grid-productos"></div>
+    </section>
+
+    <section id="sec-ventas" class="content-section">
+        <h2>Gestión de Compras</h2>
+        
+        <div class="sales-summary" id="sales-summary">
+            <h3>Resumen Total de Ventas</h3>
+            <div class="total-item">
+                <span>Total de Compras:</span>
+                <strong id="total-compras">0</strong>
+            </div>
+            <div class="total-item">
+                <span>Total Productos Vendidos:</span>
+                <strong id="total-productos">0</strong>
+            </div>
+            <div class="total-item">
+                <span>Total en Dólares:</span>
+                <strong id="total-usd">$0.00</strong>
+            </div>
+            <div class="total-item">
+                <span>Total en Bolívares:</span>
+                <strong id="total-bs">Bs. 0.00</strong>
+            </div>
+        </div>
+
+        <table class="sales-table">
+            <thead>
+                <tr>
+                    <th>Productos</th>
+                    <th>Fecha</th>
+                    <th>Cant.</th>
+                    <th>Total $</th>
+                    <th>Total Bs.</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-ventas"></tbody>
+        </table>
+    </section>
+
+    <div class="modal-overlay" id="modal-tasa">
+        <div class="modal-box">
+            <h3>Tasa del Día</h3>
+            <p style="font-size: 0.85rem; color: #8b7355; text-align: center;">Esta tasa se guardará para calcular todos tus precios.</p>
+            <div class="input-group">
+                <label>Valor en Bs por cada $1:</label>
+                <input type="number" id="input-nueva-tasa" class="input-field" placeholder="Ej: 38.50">
+            </div>
+            <div class="modal-btns">
+                <button class="btn-cancel" onclick="cerrarModal('modal-tasa')">Cancelar</button>
+                <button class="btn-save" onclick="guardarTasa()">Guardar Tasa</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-crear">
+        <div class="modal-box">
+            <h3>Nuevo Producto</h3>
+            
+            <div class="input-group">
+                <label>Nombre del objeto:</label>
+                <input type="text" id="crear-nombre" class="input-field" placeholder="Ej: Martillo">
+            </div>
+            
+            <div class="input-group">
+                <label>Precio en Dólares ($):</label>
+                <input type="number" id="crear-precio" class="input-field" placeholder="0.00" oninput="calcularBsModal()">
+            </div>
+
+            <div class="input-group">
+                <label>Cantidad en Stock:</label>
+                <input type="number" id="crear-cantidad" class="input-field" placeholder="0" min="0">
+            </div>
+
+            <div class="calc-preview">
+                Precio al cliente en Bs:
+                <span id="preview-precio-bs">Bs. 0.00</span>
+            </div>
+
+            <div class="input-group">
+                <label>Foto del producto:</label>
+                <div class="photo-options">
+                    <button class="btn-photo-opt active" onclick="cambiarTipoFoto('galeria', this)">Desde Galería</button>
+                    <button class="btn-photo-opt" onclick="cambiarTipoFoto('enlace', this)">Desde Internet</button>
+                </div>
+                
+                <div id="zona-galeria" class="photo-input-zone active">
+                    <input type="file" id="crear-file" class="input-field" accept="image/*" onchange="cargarImagenArchivo(event)">
+                </div>
+                <div id="zona-enlace" class="photo-input-zone">
+                    <input type="text" id="crear-url" class="input-field" placeholder="Pega el enlace web aquí" oninput="cargarImagenUrl(this.value)">
+                </div>
+
+                <img id="preview-img" src="">
+            </div>
+
+            <div class="modal-btns">
+                <button class="btn-cancel" onclick="cerrarModal('modal-crear')">Cancelar</button>
+                <button class="btn-save" onclick="guardarProducto()">Guardar Objeto</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="cart-sidebar" id="carrito">
+        <div class="cart-header">
+            <h2>Carrito</h2>
+            <button style="background:none;border:none;color:#2a2416;font-size:1.5rem;cursor:pointer;" onclick="toggleCarrito()"><i class="ri-close-line"></i></button>
+        </div>
+        <div class="cart-items" id="lista-carrito"></div>
+        <div class="cart-footer">
+            <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>Total USD:</span><strong id="carrito-usd">$0.00</strong></div>
+            <div style="display:flex; justify-content:space-between; color:var(--accent-gold);"><span>Total Bs:</span><strong id="carrito-bs">Bs. 0.00</strong></div>
+            <button class="btn-pay" onclick="procesarCompra()">REGISTRAR COMPRA</button>
+        </div>
+    </div>
+
+    <script>
+        // --- BASE DE DATOS DE LOS 57 PRODUCTOS ---
+        const stockInicial = [
+            { id: 1, nombre: "Cemento", precioUSD: 14.00, foto: "https://static.wixstatic.com/media/5a8c91_0a31865b9f3c4ca998398f7e5ced128a~mv2.png/v1/fill/w_520,h_520,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/5a8c91_0a31865b9f3c4ca998398f7e5ced128a~mv2.png" },
+            { id: 2, nombre: "Pego Gris", precioUSD: 3.50, foto: "https://imaxacero.com/wp-content/uploads/2022/06/image063.png" },
+            { id: 3, nombre: "Pintura Flori Paint", precioUSD: 13.00, foto: "https://floripaint.com/wp-content/uploads/2024/03/CUNETE-CAUCHO-TIPO-C-scaled.jpg" },
+            { id: 4, nombre: "Pinturas en Aceite", precioUSD: 10.00, foto: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTlyaVfo_ErSvS2WoMc3Z3eQEHcDru3HD2rWw&s" },
+            { id: 5, nombre: "Tubo 4P", precioUSD: 15.00, foto: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_MPeZg6awcw_f2a5xOutoUQRXYPJFxu-ATQ&s" },
+            { id: 6, nombre: "Tubo 3P", precioUSD: 11.00, foto: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_MPeZg6awcw_f2a5xOutoUQRXYPJFxu-ATQ&s" },
+            { id: 7, nombre: "Tubo 2P", precioUSD: 7.00, foto: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_MPeZg6awcw_f2a5xOutoUQRXYPJFxu-ATQ&s" },
+            { id: 8, nombre: "Tubo 1/2P", precioUSD: 10.00, foto: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQc2OA_dWpmvcOz-kOfLgTw7EnyMJhS6phwTg&s" },
+            { id: 9, nombre: "Codo PVC 4P", precioUSD: 6.00, foto: "https://rapikom-media.s3.amazonaws.com/panel/backend/imagenes/productos/08/16910804756330.jpg" },
+            { id: 10, nombre: "Codo PVC 3P", precioUSD: 5.00, foto: "https://rapikom-media.s3.amazonaws.com/panel/backend/imagenes/productos/08/16910804756330.jpg" },
+            { id: 11, nombre: "Codo PVC 2P", precioUSD: 3.00, foto: "https://rapikom-media.s3.amazonaws.com/panel/backend/imagenes/productos/08/16910804756330.jpg" },
+            { id: 12, nombre: "Codo PVC 1/2P", precioUSD: 1.00, foto: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQSxK4bNL50xbN8GU9KrW4ZY6plBOsDo26Xg&s" },
+            { id: 13, nombre: "Te PVC 4P", precioUSD: 8.00, foto: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZl8I0i2BnqXkowe9pjlOfA7RNCzsyh0QUAQ&s" },
+            { id: 14, nombre: "Te PVC 3P", precioUSD: 6.00, foto: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZl8I0i2BnqXkowe9pjlOfA7RNCzsyh0QUAQ&s" },
+            { id: 15, nombre: "Te PVC 2P", precioUSD: 4.00, foto: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZl8I0i2BnqXkowe9pjlOfA7RNCzsyh0QUAQ&s" },
+            { id: 16, nombre: "Te PVC 1/2P", precioUSD: 1.00, foto: "https://todoparalaindustria.com/cdn/shop/products/1767.jpg?v=1698158864&width=2048" },
+            { id: 17, nombre: "Sifón PVC 2P", precioUSD: 6.00, foto: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR48bS7SU4vIR09KlzQwv_2t7wAgoRhmIllsw&s" },
+            { id: 18, nombre: "Codo Galvanizado 1/2", precioUSD: 2.00, foto: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRe8M2OWQzh14o1DsklSV14bDfw1FFiQnButQ&s" },
+            { id: 19, nombre: "Te Galvanizada 1/2P", precioUSD: 2.00, foto: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSNW8P2q8t6B6S-9m-RInF0B9Y8eM1V5FqXzA&s" },
+            { id: 20, nombre: "Copa Galv. ½ a 3/8", precioUSD: 3.00, foto: "https://http2.mlstatic.com/D_NQ_NP_2X_701635-MLV50681316937_072022-T.webp" },
+            { id: 21, nombre: "Bussy Galv. 1/2P", precioUSD: 4.00, foto: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5vIdroIzYURj8f4v1En6jG1KcAY0xGiifxw&s" },
+            { id: 22, nombre: "Junta Dress 1/2P", precioUSD: 13.00, foto: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRweOrNiSkYADoUxW4EcH05PD2_I5Dz-_-OGA&s" },
+            { id: 23, nombre: "Junta Dresser 3/8P", precioUSD: 15.00, foto: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRweOrNiSkYADoUxW4EcH05PD2_I5Dz-_-OGA&s" },
+            { id: 24, nombre: "Unión Galv. 1/2P", precioUSD: 10.00, foto: "https://www.novey.com.pa/media/catalog/product/2/3/23012023165811.jpg" },
+            { id: 25, nombre: "Anillo Galv. 1/2P", precioUSD: 2.00, foto: "https://ve.epaenlinea.com/media/catalog/product/cache/9de02ba98484dc90d74f47a4b2fb992a/a/e/ae5adc6b-3b31-4141-9eec-248dab5a4893.jpg" },
+            { id: 26, nombre: "Codo PVC 1/2P", precioUSD: 1.00, foto: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQcfLuaAfMnJD0KQDwuPgx_OCafHvSdd9IbAg&s" },
+            { id: 27, nombre: "Codo PVC 3/8P", precioUSD: 1.00, foto: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQcfLuaAfMnJD0KQDwuPgx_OCafHvSdd9IbAg&s" },
+            { id: 28, nombre: "Te PVC 1/2P", precioUSD: 1.00, foto: "https://todoparalaindustria.com/cdn/shop/products/1767.jpg?v=1698158864&width=2048" },
+            { id: 29, nombre: "Te PVC 3/8P", precioUSD: 1.00, foto: "https://todoparalaindustria.com/cdn/shop/products/1767.jpg?v=1698158864&width=2048" },
+            { id: 30, nombre: "Cable 2x12 (Metro)", precioUSD: 3.50, foto: "https://http2.mlstatic.com/D_NQ_NP_796729-MLV70703890859_072023-O.webp" },
+            { id: 31, nombre: "Mecate (Kilo)", precioUSD: 15.00, foto: "https://www.titaniccenter.com/cdn/shop/products/Mecate.png?v=1678737596&width=1214" },
+            { id: 32, nombre: "Bombillo 15W", precioUSD: 2.00, foto: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSRJ3gyH9jZiBSUS_4pUO8YFAhX2pU-tEiBpw&s" },
+            { id: 33, nombre: "Bombillo 40W", precioUSD: 13.00, foto: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJDALo8-j8-GDJ-G6Lgo7tKakE5BJ9jqBh1A&s" },
+            { id: 34, nombre: "Enchufe Hembra", precioUSD: 3.00, foto: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS7CSksZnJSolLlUxXN6S9O99M8MWu-58qGYw&s" },
+            { id: 35, nombre: "Enchufe Macho", precioUSD: 3.00, foto: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTcpVw3b207fSJ-BWbBF2n9CqEMRkU7RmpUYg&s" },
+            { id: 36, nombre: "Tomacorriente", precioUSD: 4.00, foto: "https://fixtop.com.ve/ferreteria/wp-content/uploads/2021/12/80557.jpg" },
+            { id: 37, nombre: "Interruptor", precioUSD: 4.00, foto: "https://http2.mlstatic.com/D_NQ_NP_932161-MLV69115486045_042023-O.webp" },
+            { id: 38, nombre: "Ramplus Verde", precioUSD: 0.80, foto: "https://http2.mlstatic.com/D_Q_NP_2X_611512-MLV74087366632_012024-T.webp" },
+            { id: 39, nombre: "Ramplus Gris", precioUSD: 0.80, foto: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTaiVVQX2mTNT0R_WLHNYqxDMuR1NsypuCn7g&s" },
+            { id: 40, nombre: "Ramplus Naranja", precioUSD: 0.80, foto: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTASz4x1Oqo_7oenm5uLhN96NvloVM171StoQ&s" },
+            { id: 41, nombre: "Ramplus Azul", precioUSD: 0.80, foto: "https://http2.mlstatic.com/D_Q_NP_2X_957498-MLV46262831312_062021-T.webp" },
+            { id: 42, nombre: "Brocha 1/2", precioUSD: 1.50, foto: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQoHvb88aO1KX8S-bMLW0QKAcyCx4cUJn9CgQ&s" },
+            { id: 43, nombre: "Brocha 1", precioUSD: 2.00, foto: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQoHvb88aO1KX8S-bMLW0QKAcyCx4cUJn9CgQ&s" },
+            { id: 44, nombre: "Brocha 2", precioUSD: 3.00, foto: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQoHvb88aO1KX8S-bMLW0QKAcyCx4cUJn9CgQ&s" },
+            { id: 45, nombre: "Brocha 3", precioUSD: 4.00, foto: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQoHvb88aO1KX8S-bMLW0QKAcyCx4cUJn9CgQ&s" },
+            { id: 46, nombre: "Brocha 4", precioUSD: 5.00, foto: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQoHvb88aO1KX8S-bMLW0QKAcyCx4cUJn9CgQ&s" },
+            { id: 47, nombre: "Brocha 6", precioUSD: 6.00, foto: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQoHvb88aO1KX8S-bMLW0QKAcyCx4cUJn9CgQ&s" },
+            { id: 48, nombre: "Rodillo Pequeño", precioUSD: 5.00, foto: "https://http2.mlstatic.com/D_NQ_NP_855509-MLV72834478383_112023-O.webp" },
+            { id: 49, nombre: "Rodillo Grande", precioUSD: 7.00, foto: "https://yaqui.com.mx/cdn/shop/products/ROPI-910M_f366cdb7-238a-4125-86df-1e25eff21871.jpg" },
+            { id: 50, nombre: "Cepillo Albañilería", precioUSD: 5.00, foto: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT0ttYcdv_oHfZmmKOLRhLuWWBqJjX-gjLnZQ&s" },
+            { id: 51, nombre: "Cilindro Cerradura", precioUSD: 8.00, foto: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSG9atnHMtjv4cc6WEOJ_Y_R4SZAqdK5d_0HA&s" },
+            { id: 52, nombre: "Pomo de Puerta", precioUSD: 15.00, foto: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRwXtlDzEH1rKRp-BOa-52JE53O-HNIKdsvyw&s" },
+            { id: 53, nombre: "Cerradura Cuadrada", precioUSD: 20.00, foto: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTlgu7p5UN2WRWHFisEpUUY7HA9Jadym5Uk8A&s" },
+            { id: 54, nombre: "Lana de acero", precioUSD: 5.00, foto: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQMMgglaDmZDR974tlRbporcDd1LmMNAws3mg&s" },
+            { id: 55, nombre: "Pega PVC Grande", precioUSD: 5.00, foto: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTaTUKCzjVmLjprAucB3ks7VXKV-3D7Z3mYrw&s" },
+            { id: 56, nombre: "Pega PVC Pequeña", precioUSD: 3.00, foto: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTaTUKCzjVmLjprAucB3ks7VXKV-3D7Z3mYrw&s" },
+            { id: 57, nombre: "Amarre Techo (100u)", precioUSD: 12.00, foto: "https://ve.epaenlinea.com/media/catalog/product/cache/9de02ba98484dc90d74f47a4b2fb992a/2/7/2730aff5-3273-409a-99f0-b3784be1650d.jpg" },
+            { id: 58, nombre: "Call liquida", precioUSD: 3.50, foto: "https://ve.epaenlinea.com/media/catalog/product/cache/9de02ba98484dc90d74f47a4b2fb992a/2/b/2b7ff05a-7c9c-4356-8adb-0e6237229f4e.jpg" },
+            { id: 58, nombre: "Call liquida", precioUSD: 3.50, foto: "https://http2.mlstatic.com/D_NQ_NP_821624-MLV86100139991_062025-O.webp" }
+        ]; 
+
+        // --- BASE DE DATOS LOCAL ---
+        let miTasa = parseFloat(localStorage.getItem('app_tasa')) || 0;
+        let misProductos = JSON.parse(localStorage.getItem('app_productos')) || stockInicial;
+        let misVentas = JSON.parse(localStorage.getItem('app_ventas')) || [];
+        let miCarrito = [];
+        let imagenTemporalGuardada = "";
+        
+        // Guardar productos iniciales en localStorage si no existen
+        if (!localStorage.getItem('app_productos')) {
+            localStorage.setItem('app_productos', JSON.stringify(stockInicial));
+        }
+
+        window.onload = function() {
+            actualizarTextosTasa();
+            renderizarCatalogo();
+            renderizarVentas();
+        };
+
+        // --- NAVEGACIÓN ---
+        function cambiarPestana(idSeccion, boton) {
+            document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('active'));
+            if(boton && boton.classList) {
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                boton.classList.add('active');
+            }
+            document.getElementById('sec-' + idSeccion).classList.add('active');
+        }
+
+        // --- MODALES (Abrir/Cerrar) ---
+        function cerrarModal(id) { document.getElementById(id).style.display = 'none'; }
+        
+        function abrirModalTasa() {
+            document.getElementById('input-nueva-tasa').value = miTasa > 0 ? miTasa : '';
+            document.getElementById('modal-tasa').style.display = 'flex';
+        }
+
+        function abrirModalCrear() {
+            if (miTasa <= 0) {
+                alert("Para crear productos y calcular su precio, primero debes Fijar la Tasa del Día.");
+                return;
+            }
+            document.getElementById('crear-nombre').value = '';
+            document.getElementById('crear-precio').value = '';
+            document.getElementById('preview-precio-bs').innerText = 'Bs. 0.00';
+            document.getElementById('preview-img').style.display = 'none';
+            document.getElementById('crear-file').value = '';
+            document.getElementById('crear-url').value = '';
+            imagenTemporalGuardada = "";
+            cambiarTipoFoto('galeria', document.querySelectorAll('.btn-photo-opt')[0]);
+            document.getElementById('modal-crear').style.display = 'flex';
+        }
+
+        // --- LÓGICA DE TASA ---
+        function guardarTasa() {
+            let nueva = parseFloat(document.getElementById('input-nueva-tasa').value);
+            if(nueva > 0) {
+                miTasa = nueva;
+                localStorage.setItem('app_tasa', miTasa);
+                actualizarTextosTasa();
+                renderizarCatalogo();
+                renderizarCarrito();
+                cerrarModal('modal-tasa');
+            }
+        }
+        function actualizarTextosTasa() {
+            let texto = miTasa > 0 ? `Bs. ${miTasa.toFixed(2)}` : "No fijada";
+            document.getElementById('info-tasa-catalogo').innerHTML = `<span>${texto}</span>`;
+        }
+
+        // --- LÓGICA DE CREAR PRODUCTO ---
+        function calcularBsModal() {
+            let usd = parseFloat(document.getElementById('crear-precio').value) || 0;
+            document.getElementById('preview-precio-bs').innerText = `Bs. ${(usd * miTasa).toFixed(2)}`;
+        }
+
+        function cambiarTipoFoto(tipo, btn) {
+            document.querySelectorAll('.btn-photo-opt').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.querySelectorAll('.photo-input-zone').forEach(z => z.classList.remove('active'));
+            if(tipo === 'galeria') document.getElementById('zona-galeria').classList.add('active');
+            if(tipo === 'enlace') document.getElementById('zona-enlace').classList.add('active');
+        }
+
+        function cargarImagenArchivo(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagenTemporalGuardada = e.target.result;
+                    document.getElementById('preview-img').src = imagenTemporalGuardada;
+                    document.getElementById('preview-img').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function cargarImagenUrl(url) {
+            if(url.trim() !== '') {
+                imagenTemporalGuardada = url;
+                document.getElementById('preview-img').src = url;
+                document.getElementById('preview-img').style.display = 'block';
+            } else {
+                document.getElementById('preview-img').style.display = 'none';
+            }
+        }
+
+        function guardarProducto() {
+            let nombre = document.getElementById('crear-nombre').value;
+            let precio = parseFloat(document.getElementById('crear-precio').value);
+
+            if(!nombre || isNaN(precio) || precio <= 0) {
+                alert("Ponle un nombre y un precio válido.");
+                return;
+            }
+
+            let nuevo = {
+                id: Date.now(),
+                nombre: nombre,
+                precioUSD: precio,
+                foto: imagenTemporalGuardada || 'https://via.placeholder.com/300x200/1e1e1e/FFD700?text=Sin+Foto'
+            };
+
+            misProductos.push(nuevo);
+            localStorage.setItem('app_productos', JSON.stringify(misProductos));
+            renderizarCatalogo();
+            cerrarModal('modal-crear');
+        }
+
+        function borrarProducto(id) {
+            if(confirm("¿Borrar este producto?")) {
+                misProductos = misProductos.filter(p => p.id !== id);
+                localStorage.setItem('app_productos', JSON.stringify(misProductos));
+                renderizarCatalogo();
+            }
+        }
+
+        // --- RENDERIZAR VISTAS ---
+        function renderizarCatalogo() {
+            let grid = document.getElementById('grid-productos');
+            grid.innerHTML = '';
+            misProductos.forEach(p => {
+                let bs = miTasa > 0 ? (p.precioUSD * miTasa).toFixed(2) : "0.00";
+                grid.innerHTML += `
+                    <div class="product-card">
+                        <button class="btn-delete" onclick="borrarProducto(${p.id})"><i class="ri-delete-bin-line"></i></button>
+                        <img src="${p.foto}" class="product-img">
+                        <div class="product-info">
+                            <div class="product-name">${p.nombre}</div>
+                            <div class="product-price-usd">$${p.precioUSD.toFixed(2)}</div>
+                            <div class="product-price-bs">Bs. ${bs}</div>
+                            <button class="btn-add-cart" onclick="agregarCarrito(${p.id})">Agregar</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // --- CARRITO Y COMPRAS ---
+        function toggleCarrito() { document.getElementById('carrito').classList.toggle('open'); }
+
+        function agregarCarrito(id) {
+            let p = misProductos.find(x => x.id === id);
+            if(p) {
+                miCarrito.push(p);
+                document.getElementById('cart-count').innerText = miCarrito.length;
+                renderizarCarrito();
+            }
+        }
+
+        function renderizarCarrito() {
+            let lista = document.getElementById('lista-carrito');
+            lista.innerHTML = '';
+            let tUSD = 0;
+            miCarrito.forEach(p => {
+                tUSD += p.precioUSD;
+                lista.innerHTML += `<div class="cart-item"><span>${p.nombre}</span><span>$${p.precioUSD.toFixed(2)}</span></div>`;
+            });
+            let tBs = miTasa > 0 ? (tUSD * miTasa).toFixed(2) : "0.00";
+            document.getElementById('carrito-usd').innerText = `$${tUSD.toFixed(2)}`;
+            document.getElementById('carrito-bs').innerText = `Bs. ${tBs}`;
+        }
+
+        function procesarCompra() {
+            if(miCarrito.length === 0) return alert("El carrito está vacío");
+            if(miTasa <= 0) return alert("Fija la tasa primero");
+
+            let totalUSD = miCarrito.reduce((s, p) => s + p.precioUSD, 0);
+            let totalBs = totalUSD * miTasa;
+
+            let venta = {
+                fecha: new Date().toLocaleDateString(),
+                cant: miCarrito.length,
+                usd: totalUSD,
+                bs: totalBs,
+                productos: miCarrito.map(p => ({nombre: p.nombre, foto: p.foto}))
+            };
+
+            misVentas.push(venta);
+            localStorage.setItem('app_ventas', JSON.stringify(misVentas));
+            
+            miCarrito = [];
+            document.getElementById('cart-count').innerText = 0;
+            renderizarCarrito();
+            toggleCarrito();
+            renderizarVentas();
+            
+            cambiarPestana('ventas', document.querySelectorAll('.tab-btn')[1]);
+        }
+
+        function renderizarVentas() {
+            let tbody = document.getElementById('tabla-ventas');
+            tbody.innerHTML = '';
+            
+            let totalCompras = misVentas.length;
+            let totalProductosVendidos = 0;
+            let totalUSD = 0;
+            let totalBs = 0;
+            
+            misVentas.slice().reverse().forEach((v, index) => {
+                let indiceReal = misVentas.length - 1 - index;
+                
+                totalProductosVendidos += v.cant;
+                totalUSD += v.usd;
+                totalBs += v.bs;
+                
+                let collageHTML = '';
+                let nombresHTML = '';
+                
+                if(v.productos && v.productos.length > 0) {
+                    // Agrupar productos por nombre
+                    let productosAgrupados = {};
+                    v.productos.forEach(p => {
+                        if(productosAgrupados[p.nombre]) {
+                            productosAgrupados[p.nombre].cantidad++;
+                        } else {
+                            productosAgrupados[p.nombre] = {
+                                nombre: p.nombre,
+                                foto: p.foto,
+                                cantidad: 1
+                            };
+                        }
+                    });
+                    
+                    collageHTML = '<div class="product-collage">';
+                    let nombres = [];
+                    
+                    Object.values(productosAgrupados).forEach(p => {
+                        collageHTML += '<div class="product-collage-item">';
+                        collageHTML += '<img src="' + p.foto + '" alt="' + p.nombre + '" title="' + p.nombre + '">';
+                        if(p.cantidad > 1) {
+                            collageHTML += '<span class="product-count-badge">x' + p.cantidad + '</span>';
+                        }
+                        collageHTML += '</div>';
+                        
+                        if(p.cantidad > 1) {
+                            nombres.push(p.nombre + ' (x' + p.cantidad + ')');
+                        } else {
+                            nombres.push(p.nombre);
+                        }
+                    });
+                    
+                    collageHTML += '</div>';
+                    nombresHTML = '<div class="product-names">' + nombres.join(', ') + '</div>';
+                } else {
+                    collageHTML = '<span style="color:var(--text-muted); font-size:0.8rem;">Sin imágenes</span>';
+                }
+                
+                tbody.innerHTML += '<tr><td>' + collageHTML + nombresHTML + '</td><td>' + v.fecha + '</td><td style="text-align:center;">' + v.cant + '</td><td style="color:var(--accent-gold); font-weight:bold;">$' + v.usd.toFixed(2) + '</td><td style="color:#2a2416; font-weight:bold;">Bs. ' + v.bs.toFixed(2) + '</td><td style="text-align:center;"><button class="btn-delete-sale" onclick="borrarVenta(' + indiceReal + ')"><i class="ri-delete-bin-line"></i></button></td></tr>';
+            });
+            
+            document.getElementById('total-compras').innerText = totalCompras;
+            document.getElementById('total-productos').innerText = totalProductosVendidos;
+            document.getElementById('total-usd').innerText = '$' + totalUSD.toFixed(2);
+            document.getElementById('total-bs').innerText = 'Bs. ' + totalBs.toFixed(2);
+        }
+
+        function borrarVenta(indice) {
+            if(confirm('¿Estás seguro de que quieres eliminar esta compra?')) {
+                misVentas.splice(indice, 1);
+                localStorage.setItem('app_ventas', JSON.stringify(misVentas));
+                renderizarVentas();
+            }
+        }
+    </script>
+</body>
+</html>
